@@ -32,6 +32,7 @@ div.quarto-post .metadata,
 div.quarto-post .metadata * {
   color: #1F2529 !important;
   font-weight: 500 !important;
+  font-family: Noto Sans, sans-serif !important;
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
@@ -43,7 +44,8 @@ div.quarto-post {
 }
 
 div.quarto-post .listing-title a {
-  font-weight: 600;
+  font-weight: 600 !important;
+  font-family: "Noto Serif", serif !important;
 }
 
 /* Reset links */
@@ -70,6 +72,7 @@ div.quarto-post a {
   color: #303841 !important;
   font-weight: 600;
   font-size: 1rem;
+  font-family: Noto Sans, sans-serif;
   text-decoration: none;
 }
 
@@ -86,6 +89,7 @@ div.quarto-post a {
 
 .nav-link {
   color: #303841;
+  font-family: Noto Sans, sans-serif;
 }
 
 .nav-link:hover,
@@ -219,6 +223,7 @@ div.quarto-post a {
   transition: background-color 0.3s, color 0.3s;
   font-size: 0.85rem;
   font-weight: 600;
+  font-family: Noto Sans, sans-serif;
 }
 
 .contact-button:hover {
@@ -246,6 +251,51 @@ hr {
 }
 
 /* ==============================
+   Web Apps listing
+============================== */
+#web-apps .quarto-post .body {
+  width: 100% !important;
+}
+
+#web-apps .quarto-post {
+  align-items: flex-start !important;
+}
+
+#web-apps .quarto-post .thumbnail {
+  align-self: flex-start !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+#web-apps .quarto-post .thumbnail p {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+#web-apps .quarto-post .metadata {
+  display: none !important;
+}
+
+#web-apps .quarto-post .listing-description {
+  font-family: Noto Sans, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+}
+
+a.webapp-blog-link,
+a.webapp-blog-link:visited {
+  color: #2185D5 !important;
+  text-decoration: underline !important;
+  display: inline-block !important;
+  margin-top: 0.5rem !important;
+}
+
+#web-apps .quarto-post img {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+/* ==============================
    Background and text
 ============================== */
 body,
@@ -256,4 +306,5 @@ main,
 #quarto-content {
   background-color: #FFFFFF !important;
   color: #1F2529;
+  font-family: Noto Sans, sans-serif;
 }
