@@ -255,6 +255,7 @@ hr {
 ============================== */
 #web-apps .quarto-post .body {
   width: 100% !important;
+  align-self: flex-start !important;
 }
 
 #web-apps .quarto-post {
