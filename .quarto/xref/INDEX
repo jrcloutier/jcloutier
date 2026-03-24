@@ -55,5 +55,8 @@
   },
   "blog/index.qmd": {
     "index.html": "106541db"
+  },
+  "pages/allegheny-tax-base.qmd": {
+    "allegheny-tax-base.html": "6061b1a4"
   }
 }

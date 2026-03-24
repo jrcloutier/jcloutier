@@ -10,7 +10,7 @@ about:
   links:
     - text: "{{< fa brands bluesky >}}"
       aria-label: "Bluesky"
-      href: https://bsky.app/profile/cloutierjr.bsky.social
+      href: https://bsky.app/profile/jrcloutier.com
     - text: "{{< fa brands github >}}"
       aria-label: "GitHub"
       href: https://github.com/jrcloutier
@@ -25,19 +25,27 @@ execute:
   warning: false
   
 listing:
-  contents: work.yml
-  type: default
-  sort: date desc
-  sort-ui: false
-  filter-ui: false
-  fields: [title, date, author]
-  image-align: left
+  - id: recent-work
+    contents: pages/work.yml
+    type: default
+    sort: date desc
+    sort-ui: false
+    filter-ui: false
+    fields: [title, date, author]
+    image-align: left
+  - id: web-apps
+    contents: pages/webapps.yml
+    type: default
+    sort: date desc
+    sort-ui: false
+    filter-ui: false
+    fields: [title, description, image]
+    image-align: left
 ---
 
 <br><br>
 
 ::: {#hero-heading}
-I’m a data and investigative journalist — which basically means I dig into large datasets and records to uncover stories in the public interest. I currently report for the [Pittsburgh Post-Gazette](https://www.post-gazette.com/), covering politics, housing, the coal industry, and more. Before that, I tracked campaign finance and lobbying for [OpenSecrets](https://www.opensecrets.org/), a nonprofit that monitors money’s influence in U.S. politics.
 :::
 
 <br>
@@ -45,3 +53,15 @@ I’m a data and investigative journalist — which basically means I dig into l
 ------------------------------------------------------------------------
 
 #### Recent work
+
+::: {#recent-work}
+:::
+
+<br>
+
+------------------------------------------------------------------------
+
+#### Web Apps
+
+::: {#web-apps}
+:::

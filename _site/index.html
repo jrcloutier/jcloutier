@@ -56,7 +56,7 @@ ul.task-list li input[type="checkbox"] {
 <script>
 
   window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    const listingTargetEl = window.document.querySelector('#listing-recent-work .list');
     if (!listingTargetEl) {
       // No listing discovered, do not attach.
       return; 
@@ -69,7 +69,35 @@ ul.task-list li input[type="checkbox"] {
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+    window['quarto-listings']['listing-recent-work'] = new List('listing-recent-work', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-web-apps .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-title','listing-description','listing-image',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-title","listing-date","listing-description","listing-image"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-web-apps'] = new List('listing-web-apps', options);
 
     if (window['quarto-listing-loaded']) {
       window['quarto-listing-loaded']();
@@ -167,7 +195,7 @@ window.Quarto = {
 <div class="quarto-title-meta">
   </div>
 </header> <div class="about-links">
-  <a href="https://bsky.app/profile/cloutierjr.bsky.social" class="about-link" rel="" target="">
+  <a href="https://bsky.app/profile/jrcloutier.com" class="about-link" rel="" target="">
      <span class="about-link-text"><i class="fa-brands fa-bluesky" aria-label="bluesky"></i></span>
   </a>
   <a href="https://github.com/jrcloutier" class="about-link" rel="" target="">
@@ -178,7 +206,6 @@ window.Quarto = {
   </a>
 </div>
       <div class="about-contents"><div id="hero-heading">
-<p>I’m a data and investigative journalist — which basically means I dig into large datasets and records to uncover stories in the public interest. I currently report for the <a href="https://www.post-gazette.com/">Pittsburgh Post-Gazette</a>, covering politics, housing, the coal industry, and more. Before that, I tracked campaign finance and lobbying for <a href="https://www.opensecrets.org/">OpenSecrets</a>, a nonprofit that monitors money’s influence in U.S. politics.</p>
 </div></div>
     </div>
   </div>
@@ -187,16 +214,30 @@ window.Quarto = {
 <p><br></p>
 <hr>
 <section id="recent-work" class="level4">
-<h4 data-anchor-id="recent-work">Recent work</h4>
-
-
-
-
-</section>
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+<h4>Recent work</h4>
+<div id="listing-recent-work" class="quarto-listing quarto-listing-container-default">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-left" data-index="0" data-listing-date-sort="1766293200000">
+<div class="quarto-post image-left" data-index="0" data-listing-date-sort="1771131600000">
+<div class="body">
+<h3 class="no-anchor listing-title" data-anchor-id="recent-work">
+<a href="https://www.post-gazette.com/business/development/2026/02/15/allegheny-county-property-tax-appeal-2026/stories/202602150063" class="no-external">How Allegheny County’s tax base is collapsing — one appeal at a time</a>
+</h3>
+<div class="listing-subtitle">
+<a href="https://www.post-gazette.com/business/development/2026/02/15/allegheny-county-property-tax-appeal-2026/stories/202602150063" class="no-external"></a>
+</div>
+</div>
+<div class="metadata">
+<a href="https://www.post-gazette.com/business/development/2026/02/15/allegheny-county-property-tax-appeal-2026/stories/202602150063" class="no-external">
+<div class="listing-date">
+Feb 15, 2026
+</div>
+<div class="listing-author">
+Pittsburgh Post-Gazette
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-left" data-index="1" data-listing-date-sort="1766293200000">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="https://www.post-gazette.com/news/politics-local/2025/12/21/pittsburgh-ice-detention-washington-county/stories/202512110086" class="no-external">Hundreds taken into custody at Pittsburgh ICE office</a>
@@ -216,7 +257,7 @@ Pittsburgh Post-Gazette
 </a>
 </div>
 </div>
-<div class="quarto-post image-left" data-index="1" data-listing-date-sort="1765688400000">
+<div class="quarto-post image-left" data-index="2" data-listing-date-sort="1765688400000">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="https://www.post-gazette.com/news/health/2025/12/14/coal-dust-silica-black-lung-msha/stories/202512140064" class="no-external">Deadly Toxic Trail: Thousands of miners left in danger by critical enforcement gaps</a>
@@ -236,7 +277,7 @@ Pittsburgh Post-Gazette
 </a>
 </div>
 </div>
-<div class="quarto-post image-left" data-index="2" data-listing-date-sort="1756008000000">
+<div class="quarto-post image-left" data-index="3" data-listing-date-sort="1756008000000">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="https://www.post-gazette.com/news/health/2025/08/24/dust-coal-miners-toxins-silica-pennsylvania/stories/202508240040" class="no-external">Deadly dust: Missed inspections, enforcement failures imperil the lives of coal miners</a>
@@ -256,7 +297,7 @@ Pittsburgh Post-Gazette
 </a>
 </div>
 </div>
-<div class="quarto-post image-left" data-index="3" data-listing-date-sort="1753588800000">
+<div class="quarto-post image-left" data-index="4" data-listing-date-sort="1753588800000">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="https://www.post-gazette.com/news/politics-local/2025/07/27/pittsburgh-mayor-campaign-finances-gainey-oconnor/stories/202507260006" class="no-external">How dark money flooded the race for Pittsburgh mayor</a>
@@ -276,7 +317,7 @@ Pittsburgh Post-Gazette
 </a>
 </div>
 </div>
-<div class="quarto-post image-left" data-index="4" data-listing-date-sort="1751860800000">
+<div class="quarto-post image-left" data-index="5" data-listing-date-sort="1751860800000">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="https://www.post-gazette.com/news/politics-nation/2025/07/07/ice-immigration-western-pa-arrest-raids-trump-bill/stories/202507030095" class="no-external">ICE detentions surge across Western Pa.</a>
@@ -296,7 +337,7 @@ Pittsburgh Post-Gazette
 </a>
 </div>
 </div>
-<div class="quarto-post image-left" data-index="5" data-listing-date-sort="1749960000000">
+<div class="quarto-post image-left" data-index="6" data-listing-date-sort="1749960000000">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="https://www.post-gazette.com/business/development/2025/06/15/pittsburgh-budget-tax-exempt/stories/202506100068" class="no-external">As Pittsburgh nears a budget crisis, tax-exempt statuses have gone unchecked for years</a>
@@ -316,7 +357,7 @@ Pittsburgh Post-Gazette
 </a>
 </div>
 </div>
-<div class="quarto-post image-left" data-index="6" data-listing-date-sort="1746936000000">
+<div class="quarto-post image-left" data-index="7" data-listing-date-sort="1746936000000">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="https://www.post-gazette.com/news/politics-local/2025/05/11/affordable-housing-pittsbugh-mayor/stories/202505110067" class="no-external">As Pittsburgh confronts affordable housing crisis, mayor touts successes but data shows shortfalls</a>
@@ -336,7 +377,7 @@ Pittsburgh Post-Gazette
 </a>
 </div>
 </div>
-<div class="quarto-post image-left" data-index="7" data-listing-date-sort="1743307200000">
+<div class="quarto-post image-left" data-index="8" data-listing-date-sort="1743307200000">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="https://www.post-gazette.com/business/powersource/2025/03/30/coal-mine-safety-doge-trump-spending-cuts-federal/stories/202503280062" class="no-external">Deep fear in coal country: DOGE cuts put region’s miners and families on edge</a>
@@ -356,7 +397,7 @@ Pittsburgh Post-Gazette
 </a>
 </div>
 </div>
-<div class="quarto-post image-left" data-index="8" data-listing-date-sort="1741924800000">
+<div class="quarto-post image-left" data-index="9" data-listing-date-sort="1741924800000">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="https://www.post-gazette.com/local/city/2025/03/14/pittsburgh-vinebrook-homes-corporate-landlords-allegheny-county/stories/202503120069" class="no-external">Flush with million, out-of-state corporate landlords shake up Allegheny County landscape</a>
@@ -369,26 +410,6 @@ Pittsburgh Post-Gazette
 <a href="https://www.post-gazette.com/local/city/2025/03/14/pittsburgh-vinebrook-homes-corporate-landlords-allegheny-county/stories/202503120069" class="no-external">
 <div class="listing-date">
 Mar 14, 2025
-</div>
-<div class="listing-author">
-Pittsburgh Post-Gazette
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-left" data-index="9" data-listing-date-sort="1739595600000">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="https://www.post-gazette.com/business/development/2026/02/15/allegheny-county-property-tax-appeal-2026/stories/202602150063" class="no-external">How Allegheny County’s tax base is collapsing — one appeal at a time</a>
-</h3>
-<div class="listing-subtitle">
-<a href="https://www.post-gazette.com/business/development/2026/02/15/allegheny-county-property-tax-appeal-2026/stories/202602150063" class="no-external"></a>
-</div>
-</div>
-<div class="metadata">
-<a href="https://www.post-gazette.com/business/development/2026/02/15/allegheny-county-property-tax-appeal-2026/stories/202602150063" class="no-external">
-<div class="listing-date">
-Feb 15, 2025
 </div>
 <div class="listing-author">
 Pittsburgh Post-Gazette
@@ -480,7 +501,48 @@ Howard Center for Investigative Journalism
 <div class="listing-no-matching d-none">
 No matching items
 </div>
-</div></main> <!-- /main -->
+</div>
+<p><br></p>
+<hr>
+</section>
+<section id="web-apps" class="level4">
+<h4>Web Apps</h4>
+<div id="listing-web-apps" class="quarto-listing quarto-listing-container-default">
+<div class="list quarto-listing-default">
+<div class="quarto-post image-left" data-index="0" data-listing-date-sort="1771131600000">
+<div class="thumbnail">
+<p><a href="http://tax-base-tracker.jrcloutier.com/" class="no-external"></a></p><a href="http://tax-base-tracker.jrcloutier.com/" class="no-external">
+<p><img loading="lazy" src="./assets/media/country-tax-base-tracker.png" class="thumbnail-image"></p>
+</a><p><a href="http://tax-base-tracker.jrcloutier.com/" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title" data-anchor-id="web-apps">
+<a href="http://tax-base-tracker.jrcloutier.com/" class="no-external">Allegheny Tax Base</a>
+</h3>
+<div class="listing-subtitle">
+<a href="http://tax-base-tracker.jrcloutier.com/" class="no-external"></a>
+</div>
+<div class="listing-description">
+<a href="http://tax-base-tracker.jrcloutier.com/" class="no-external">A tool to track weekly changes in Allegheny County’s tax base.</a>
+</div>
+</div>
+<div class="metadata">
+<p><a href="http://tax-base-tracker.jrcloutier.com/" class="no-external"></a></p><a href="http://tax-base-tracker.jrcloutier.com/" class="no-external">
+</a>
+</div>
+</div>
+</div>
+<div class="listing-no-matching d-none">
+No matching items
+</div>
+</div>
+
+
+
+
+</section>
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
