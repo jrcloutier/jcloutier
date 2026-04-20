@@ -1,6 +1,12 @@
 project:
   type: website
   output-dir: _site
+  render:
+    - index.qmd
+    - about.qmd
+    - work.yml
+    - webapps.yml
+    - data-reporting-pg-pres.qmd
   resources:
     - assets/media
     - mockups/**
@@ -12,7 +18,7 @@ website:
   navbar:
     right:
       - text: "About"
-        href: pages/about.qmd
+        href: about.qmd
   search: false
   page-footer:
     left: >-

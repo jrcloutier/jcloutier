@@ -1,27 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.jrcloutier.com/pages/presentations.html</loc>
+    <loc>https://www.jrcloutier.com/data-reporting-pg-pres.html</loc>
     <lastmod>2026-02-09T22:26:49.495Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.jrcloutier.com/pages/data-reporting-pg-pres.html</loc>
-    <lastmod>2026-02-09T22:26:49.495Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.jrcloutier.com/blog/posts/2025-12-02-tidycensus.html</loc>
-    <lastmod>2025-12-02T04:27:50.351Z</lastmod>
   </url>
   <url>
     <loc>https://www.jrcloutier.com/index.html</loc>
-    <lastmod>2026-03-24T01:03:04.829Z</lastmod>
+    <lastmod>2026-04-19T23:52:43.489Z</lastmod>
   </url>
   <url>
-    <loc>https://www.jrcloutier.com/blog/index.html</loc>
-    <lastmod>2025-12-02T04:29:41.309Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.jrcloutier.com/pages/about.html</loc>
-    <lastmod>2026-02-19T20:24:56.458Z</lastmod>
+    <loc>https://www.jrcloutier.com/about.html</loc>
+    <lastmod>2026-04-20T12:37:57.227Z</lastmod>
   </url>
 </urlset>

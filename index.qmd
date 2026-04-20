@@ -26,7 +26,7 @@ execute:
   
 listing:
   - id: recent-work
-    contents: pages/work.yml
+    contents: work.yml
     type: default
     sort: date desc
     sort-ui: false
@@ -34,7 +34,7 @@ listing:
     fields: [title, date, author]
     image-align: left
   - id: web-apps
-    contents: pages/webapps.yml
+    contents: webapps.yml
     type: default
     sort: date desc
     sort-ui: false
