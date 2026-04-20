@@ -1,31 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://www.jrcloutier.com/data-reporting-pg-pres.html</loc>
+    <lastmod>2026-04-20T13:15:29.907Z</lastmod>
+  </url>
+  <url>
     <loc>https://www.jrcloutier.com/index.html</loc>
-    <lastmod>2026-04-20T12:40:48.914Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.jrcloutier.com/blog/posts/2025-12-02-tidycensus.html</loc>
-    <lastmod>2026-04-20T12:40:48.914Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.jrcloutier.com/pages/data-reporting-pg-pres.html</loc>
-    <lastmod>2026-04-20T12:40:48.988Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.jrcloutier.com/pages/presentations.html</loc>
-    <lastmod>2026-04-20T12:40:48.988Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.jrcloutier.com/pages/about.html</loc>
-    <lastmod>2026-04-20T12:40:48.988Z</lastmod>
+    <lastmod>2026-04-20T13:15:29.907Z</lastmod>
   </url>
   <url>
     <loc>https://www.jrcloutier.com/about.html</loc>
-    <lastmod>2026-04-20T12:40:48.894Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.jrcloutier.com/blog/index.html</loc>
-    <lastmod>2026-04-20T12:40:48.914Z</lastmod>
+    <lastmod>2026-04-20T13:15:29.889Z</lastmod>
   </url>
 </urlset>
