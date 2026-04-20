@@ -1,0 +1,55 @@
+---
+title: "About"
+format: html
+---
+
+I'm Jimmy Cloutier, a data and investigative journalist at the [Pittsburgh Post-Gazette](https://www.post-gazette.com/). I dig into large datasets and public records to uncover stories in the public interest.
+
+Before joining the Post-Gazette, I covered campaign finance and lobbying for [OpenSecrets](https://www.opensecrets.org/), a nonprofit that tracks the influence of money in U.S. politics. I also freelanced for the [Virginia Center for Investigative Journalism](https://vcij.org/).
+
+I studied English literature at Virginia Commonwealth University and earned a master’s in investigative journalism from the Howard Center for Investigative Journalism at Arizona State University. Along the way, I taught high school and spent two years in Armenia with the U.S. Peace Corps, teaching English as a foreign language.
+
+I was born in Québec, Canada, but I grew up a thousand miles south in the suburbs outside of Richmond, Va. 
+
+------------------------------------------------------------------------
+
+#### Contact
+
+<b>Have a tip for a story?</b> If you have information to share from inside the government, the companies where you work or from your communities, please reach out securely via Signal or email.
+
+
+::: {.contact-list}
+
+::: {.contact-item}
+[{{< fa envelope >}}]{.contact-icon} **Email:**&nbsp;[jcloutier@post-gazette.com](mailto:jcloutier@post-gazette.com)
+:::
+
+::: {.contact-item}
+[{{< fa brands signal-messenger >}}]{.contact-icon} **Signal:**&nbsp;[jrcloutier.92](https://signal.me/#eu/mfRohdbtUfQcObyk9dwMWhF_hWJFpQlaN2D-EIyG_vz30vghVJNBF7vozqmyjfhw)
+:::
+
+:::
+
+------------------------------------------------------------------------
+
+#### Honors
+
+<div class="honors-table">
+<table><tbody>
+<tr class="year-row"><td>2026</td></tr>
+<tr><td><strong>Pittsburgh Black Media Federation</strong></td><td>Robert L. Vann, Daily Enterprise/Investigative</td><td>1st place</td></tr>
+<tr><td></td><td>Robert L. Vann, Daily Enterprise/Investigative</td><td>2nd place</td></tr>
+<tr><td></td><td>Robert L. Vann, Daily Enterprise/Investigative</td><td>3rd place</td></tr>
+<tr><td><strong>SABEW</strong></td><td>Best in Business, Government</td><td>Hon. Mention</td></tr>
+<tr><td><strong>Goldsmith Prize</strong></td><td>Investigative Reporting</td><td>Semifinalist</td></tr>
+<tr class="year-row"><td>2025</td></tr>
+<tr><td><strong>Pittsburgh Black Media Federation</strong></td><td>Robert L. Vann, Daily Enterprise/Investigative</td><td>1st place</td></tr> 
+<tr><td><strong>Society of Professional Journalists, Keystone</strong></td><td>Spotlight Award</td><td>2nd place</td></tr>
+<tr><td><strong>Press Club of Western Pennsylvania</strong></td><td>Excellence in Written Journalism, Business</td><td>Finalist</td></tr>
+<tr class="year-row"><td>2022</td></tr>
+<tr><td><strong>SABEW</strong></td><td>Best in Business, Projects and Collaborations</td><td>1st place</td></tr>
+<tr><td><strong>EPPY</strong></td><td>Best Collegiate Investigation</td><td>1st place</td></tr>
+<tr><td><strong>Society of Environmental Journalists</strong></td><td>Outstanding Student Reporting</td><td>1st place</td></tr>
+<tr><td></td><td>Nina Mason Pulliam Environmental Reporting</td><td>Hon. Mention</td></tr>
+</tbody></table>
+</div>
