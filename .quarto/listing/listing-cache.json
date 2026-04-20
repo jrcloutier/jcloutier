@@ -1,11 +1,8 @@
 {
   "listingMap": {
     "index.qmd": [
-      "pages/work.yml",
-      "pages/webapps.yml"
-    ],
-    "blog/index.qmd": [
-      "posts"
+      "work.yml",
+      "webapps.yml"
     ]
   }
 }

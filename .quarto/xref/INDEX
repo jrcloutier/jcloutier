@@ -58,5 +58,14 @@
   },
   "pages/allegheny-tax-base.qmd": {
     "allegheny-tax-base.html": "6061b1a4"
+  },
+  "pages/ai-case-cases.qmd": {
+    "ai-case-cases.html": "9762e068"
+  },
+  "docs/ai-use-cases/pulling-structured-data-from-html.qmd": {
+    "pulling-structured-data-from-html.html": "27189891"
+  },
+  "data-reporting-pg-pres.qmd": {
+    "data-reporting-pg-pres.html": "0ff75105"
   }
 }
