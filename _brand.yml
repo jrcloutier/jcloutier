@@ -16,12 +16,8 @@ typography:
   fonts:
     - family: Noto Sans
       source: google
-    - family: Noto Serif
-      source: google
     - family: Noto Mono
       source: google
-  base: Noto Sans
-  headings: Noto Serif
   link:
     decoration: underline
   monospace: Noto Mono
