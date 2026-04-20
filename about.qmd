@@ -3,9 +3,9 @@ title: "About"
 format: html
 ---
 
-I'm Jimmy Cloutier, a data and investigative journalist at the [Pittsburgh Post-Gazette](https://www.post-gazette.com/). I dig into large datasets and public records to uncover stories in the public interest.
+I am a data and investigative journalist at the [Pittsburgh Post-Gazette](https://www.post-gazette.com/), where I have covered a range of issues from “dark money” in politics to mine safety and the government’s failure to protect workers from toxic dust. 
 
-Before joining the Post-Gazette, I covered campaign finance and lobbying for [OpenSecrets](https://www.opensecrets.org/), a nonprofit that tracks the influence of money in U.S. politics. I also freelanced for the [Virginia Center for Investigative Journalism](https://vcij.org/).
+Before joining the Post-Gazette, I covered campaign finance and lobbying for [OpenSecrets](https://www.opensecrets.org/), a nonprofit that tracks the influence of money in U.S. politics. 
 
 I studied English literature at Virginia Commonwealth University and earned a master’s in investigative journalism from the Howard Center for Investigative Journalism at Arizona State University. Along the way, I taught high school and spent two years in Armenia with the U.S. Peace Corps, teaching English as a foreign language.
 
