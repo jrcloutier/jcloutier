@@ -222,9 +222,9 @@
 </head>
 <body>
 <div id="map-container">
-  <div class="map-hed">Pa. is seeing its worst measles surge since 1991</div>
+  <div class="map-hed">Pennsylvania is seeing its worst measles surge since 1991</div>
 
-  <div class="map-chatter">State health officials have confirmed 50 measles cases across six counties during two outbreaks in 2026 — the highest number in more than three decades. The current outbreak has totaled 38 cases so far — most of the infections impacting school-age children — and the first surge in the state started in late February, involving a dozen patients. The cases come as tens of thousands of parents are now opting to skip the shots for their children, driving down immunization rates in hundreds of schools across the state, the Post-Gazette found.</div>
+  <div class="map-chatter">State health officials have confirmed 60 measles cases in two separate outbreaks in Pennsylvania this year — the highest number in more than three decades. The current outbreak started in late April and has infected 48 people so far. The other began in February and ended weeks later after impacting a dozen people. The majority of patients affected in both surges were school-aged children. The cases come as tens of thousands of parents are now opting to skip the shots for their children, driving down immunization rates in hundreds of schools across the state, the Post-Gazette found.</div>
 
   <div class="legend">
     <div class="legend-item">
@@ -253,8 +253,8 @@ const caseData = {
   "Berks":      { total: 1,  ob1: 0, ob2: 1  },
   "Chester":    { total: 1,  ob1: 1, ob2: 0  },
   "Dauphin":    { total: 2,  ob1: 0, ob2: 2  },
-  "Lancaster":  { total: 29, ob1: 8, ob2: 21 },
-  "Lebanon":    { total: 14, ob1: 0, ob2: 14 },
+  "Lancaster":  { total: 34, ob1: 8, ob2: 26 },
+  "Lebanon":    { total: 19, ob1: 0, ob2: 19 },
   "Montgomery": { total: 3,  ob1: 3, ob2: 0  },
 };
 
@@ -286,8 +286,8 @@ const path = d3.geoPath().projection(projection);
 const insetW = 110, insetH = 75;
 const insetX = 8, insetY = 275 - insetH - 14; // pinned bottom-left in SVG coords
 const insetProj = d3.geoMercator()
-  .center([-77.7, 41.0])
-  .scale(1050)
+  .center([-77.5, 41.1])
+  .scale(870)
   .translate([insetW / 2, insetH / 2]);
 const insetPath = d3.geoPath().projection(insetProj);
 
@@ -331,8 +331,8 @@ d3.json(topoUrl).then(us => {
 
   // All PA counties in muted gray
   // White PA shape, transparent background, red locator box
-  const boxLon = [-76.85, -75.15];
-  const boxLat = [39.65, 40.58];
+  const boxLon = [-77.63, -74.57];
+  const boxLat = [39.38, 40.78];
   const tl = insetProj([boxLon[0], boxLat[1]]);
   const br = insetProj([boxLon[1], boxLat[0]]);
 
