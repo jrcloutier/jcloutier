@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Measles in Pennsylvania</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Georgia', serif;
+    background: #fff;
+    color: #1a1a1a;
+  }
+
+  #map-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .map-hed {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 8px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #1a1a1a;
+  }
+
+  .map-chatter {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  /* Header row: chatter left, legend right */
+  .map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+
+  .map-header-left {
+    flex: 1;
+  }
+
+  /* Legend */
+  #map-svg {
+    margin-bottom: 8px;
+  }
+
+  .legend {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #555;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+
+  #map-svg {
+    margin-top: 6px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-circle {
+    border-radius: 50%;
+    border: 1.5px solid #c0392b;
+    background: rgba(220, 80, 60, 0.18);
+    flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+  }
+
+  .legend-circle.inactive {
+    border-color: #888;
+    background: rgba(140, 140, 140, 0.15);
+  }
+
+  /* SVG map */
+  #map-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .inset-county { }
+
+  .county {
+    fill: #efefef;
+    stroke: #fff;
+    stroke-width: 0.75px;
+  }
+
+  .county.affected {
+    fill: #fad9a0;
+  }
+
+  .county.affected.inactive {
+    fill: #d8d8d8;
+  }
+
+  /* Bubble circles */
+  .bubble {
+    stroke-width: 1px;
+    fill-opacity: 0.12;
+    cursor: pointer;
+    transition: fill-opacity 0.15s;
+  }
+
+  .bubble.active {
+    fill: #c0392b;
+    stroke: #c0392b;
+  }
+
+  .bubble.inactive {
+    fill: #888;
+    stroke: #888;
+  }
+
+  .bubble:hover { fill-opacity: 0.4; }
+
+  /* County labels for Lancaster + Lebanon */
+  .county-label {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    fill: #222;
+    pointer-events: none;
+    letter-spacing: 0.01em;
+  }
+
+  /* City reference dots + labels */
+  .city-dot {
+    fill: #555;
+    stroke: #fff;
+    stroke-width: 1px;
+  }
+
+  .city-label {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    fill: #444;
+    pointer-events: none;
+  }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    max-width: 200px;
+    z-index: 100;
+  }
+
+  #tooltip .tt-county {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #1a1a1a;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+  }
+
+  #tooltip .tt-ob1 {
+    color: #888;
+    font-size: 12px;
+    margin-top: 4px;
+    font-family: Arial, sans-serif;
+  }
+
+  #tooltip .tt-ob2 {
+    color: #c0392b;
+    font-size: 12px;
+    margin-top: 4px;
+    font-family: Arial, sans-serif;
+  }
+
+  .map-source {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+
+
+
+
+
+
+
+
+
+</style>
+</head>
+<body>
+<div id="map-container">
+  <div class="map-hed">Pennsylvania is seeing its worst measles surge since 1991</div>
+
+  <div class="map-chatter">State health officials have confirmed 50 measles cases across six counties in 2026 — the highest number in more than three decades. The current outbreak has totaled 38 cases so far — most of the infections impacting school-age children — and the first surge in the state started in late February, involving a dozen patients. The cases come as tens of thousands of parents are now opting to skip the shots for their children, driving down immunization rates in hundreds of schools across the state, the Post-Gazette found.</div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-circle"></div>
+      <span>Current outbreak (cases since late April)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-circle inactive"></div>
+      <span>Prior outbreak (January – March)</span>
+    </div>
+  </div>
+  <div style="position:relative;line-height:0;">
+    <svg id="map-svg" viewBox="0 0 600 275" style="width:100%;height:auto;display:block"></svg>
+  </div>
+
+  <div class="map-source">Map: Jimmy Cloutier / Post-Gazette &bull; Source: Pennsylvania Department of Health</div>
+</div>
+
+<div id="tooltip">
+  <div class="tt-county"></div>
+  <div class="tt-rows"></div>
+</div>
+
+<script>
+const caseData = {
+  "Berks":      { total: 1,  ob1: 0, ob2: 1  },
+  "Chester":    { total: 1,  ob1: 1, ob2: 0  },
+  "Dauphin":    { total: 2,  ob1: 0, ob2: 2  },
+  "Lancaster":  { total: 29, ob1: 8, ob2: 21 },
+  "Lebanon":    { total: 14, ob1: 0, ob2: 14 },
+  "Montgomery": { total: 3,  ob1: 3, ob2: 0  },
+};
+
+
+
+// Reference cities
+const cities = [
+  { name: "Philadelphia", lon: -75.1652, lat: 39.9526, anchor: "start", dx: 6,  dy: 4,  star: false },
+  { name: "Harrisburg",   lon: -76.8844, lat: 40.2732, anchor: "end",   dx: -6, dy: 4,  star: true  },
+];
+
+function isInactive(d) {
+  return d.ob1 > 0 && d.ob2 === 0;
+}
+
+const svg = d3.select("#map-svg");
+const width = 600, height = 340;
+
+// Main map: zoomed into outbreak region (SE/Central PA)
+// Covers Dauphin, Lebanon, Lancaster, Berks, Chester, Montgomery + buffer
+const projection = d3.geoMercator()
+  .center([-76.1, 40.08])
+  .scale(11200)
+  .translate([width / 2, height / 2]);
+
+const path = d3.geoPath().projection(projection);
+
+// Inset: full PA — small locator, drawn inside main SVG
+const insetW = 110, insetH = 75;
+const insetX = 8, insetY = 275 - insetH - 14; // pinned bottom-left in SVG coords
+const insetProj = d3.geoMercator()
+  .center([-77.7, 41.0])
+  .scale(1050)
+  .translate([insetW / 2, insetH / 2]);
+const insetPath = d3.geoPath().projection(insetProj);
+
+const maxCases = d3.max(Object.values(caseData), d => d.total);
+const rScale = d3.scaleSqrt().domain([0, maxCases]).range([0, 45]);
+
+const paFips = {
+  "42001":"Adams","42003":"Allegheny","42005":"Armstrong","42007":"Beaver",
+  "42009":"Bedford","42011":"Berks","42013":"Blair","42015":"Bradford",
+  "42017":"Bucks","42019":"Butler","42021":"Cambria","42023":"Cameron",
+  "42025":"Carbon","42027":"Centre","42029":"Chester","42031":"Clarion",
+  "42033":"Clearfield","42035":"Clinton","42037":"Columbia","42039":"Crawford",
+  "42041":"Cumberland","42043":"Dauphin","42045":"Delaware","42047":"Elk",
+  "42049":"Erie","42051":"Fayette","42053":"Forest","42055":"Franklin",
+  "42057":"Fulton","42059":"Greene","42061":"Huntingdon","42063":"Indiana",
+  "42065":"Jefferson","42067":"Juniata","42069":"Lackawanna","42071":"Lancaster",
+  "42073":"Lawrence","42075":"Lebanon","42077":"Lehigh","42079":"Luzerne",
+  "42081":"Lycoming","42083":"McKean","42085":"Mercer","42087":"Mifflin",
+  "42089":"Monroe","42091":"Montgomery","42093":"Montour","42095":"Northampton",
+  "42097":"Northumberland","42099":"Perry","42101":"Philadelphia","42103":"Pike",
+  "42105":"Potter","42107":"Schuylkill","42109":"Snyder","42111":"Somerset",
+  "42113":"Sullivan","42115":"Susquehanna","42117":"Tioga","42119":"Union",
+  "42121":"Venango","42123":"Warren","42125":"Washington","42127":"Wayne",
+  "42129":"Westmoreland","42131":"Wyoming","42133":"York"
+};
+
+const topoUrl = "https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json";
+
+d3.json(topoUrl).then(us => {
+  const paCounties = topojson.feature(us, us.objects.counties);
+  paCounties.features = paCounties.features.filter(d => d.id.toString().startsWith("42"));
+
+  const g = svg.append("g");
+
+  // ── Inset locator map — pinned inside main SVG ───────────────────────────
+  const insetG = svg.append("g").attr("transform", `translate(${insetX}, ${insetY})`);
+
+
+
+  const ig = insetG;
+
+  // All PA counties in muted gray
+  // White PA shape, transparent background, red locator box
+  const boxLon = [-76.85, -75.15];
+  const boxLat = [39.65, 40.58];
+  const tl = insetProj([boxLon[0], boxLat[1]]);
+  const br = insetProj([boxLon[1], boxLat[0]]);
+
+  const paUnion = topojson.merge(us, us.objects.counties.geometries.filter(d => d.id.toString().startsWith("42")));
+  ig.append("path")
+    .datum(paUnion)
+    .attr("d", insetPath)
+    .attr("fill", "#fff")
+    .attr("stroke", "#999")
+    .attr("stroke-width", 0.8);
+
+  ig.append("rect")
+    .attr("x", tl[0])
+    .attr("y", tl[1])
+    .attr("width", br[0] - tl[0])
+    .attr("height", br[1] - tl[1])
+    .attr("fill", "rgba(192,57,43,0.12)")
+    .attr("stroke", "#c0392b")
+    .attr("stroke-width", 1.5);
+
+
+  // Counties
+  g.selectAll(".county")
+    .data(paCounties.features)
+    .join("path")
+    .attr("class", d => {
+      const name = paFips[d.id];
+      if (!name || !caseData[name]) return "county";
+      return "county affected" + (isInactive(caseData[name]) ? " inactive" : "");
+    })
+    .attr("d", path)
+;
+
+  // Bubbles — draw larger first so smaller sits on top and is hoverable
+  // Label positioning: custom per county to avoid overlap
+  const labelConfig = {
+    "Lancaster":  { anchor: "middle", dx: 0,   dy: 1,  pos: "below" },
+    "Lebanon":    { anchor: "middle", dx: 0,   dy: -1, pos: "above" },
+    "Berks":      { anchor: "start",  dx: 8,   dy: 0,  pos: "right" },
+    "Chester":    { anchor: "middle", dx: 0,   dy: 1,  pos: "below" },
+    "Dauphin":    { anchor: "end",    dx: -8,  dy: 0,  pos: "left"  },
+    "Montgomery": { anchor: "start",  dx: 8,   dy: 0,  pos: "right" },
+  };
+
+  Object.entries(caseData).forEach(([name, data]) => {
+    const feature = paCounties.features.find(f => paFips[f.id] === name);
+    if (!feature) return;
+    const centroid = path.centroid(feature);
+
+    const outbreaks = [
+      { cases: data.ob1, cls: "inactive" },
+      { cases: data.ob2, cls: "active"   },
+    ];
+
+    outbreaks.sort((a, b) => b.cases - a.cases);
+
+    outbreaks.forEach(ob => {
+      if (ob.cases === 0) return;
+      const r = rScale(ob.cases);
+      g.append("circle")
+        .attr("class", `bubble ${ob.cls}`)
+        .attr("cx", centroid[0])
+        .attr("cy", centroid[1])
+        .attr("r", r)
+        .on("mouseover", (event) => showTooltip(event, name, ob.cases))
+        .on("mousemove", moveTooltip)
+        .on("mouseout", hideTooltip);
+    });
+
+    // Label every affected county
+    const cfg = labelConfig[name];
+    const maxR = rScale(Math.max(data.ob1, data.ob2, 1));
+    let lx = centroid[0] + cfg.dx;
+    let ly = centroid[1] + cfg.dy;
+    if (cfg.pos === "above") ly = centroid[1] - maxR - 5;
+    if (cfg.pos === "below") ly = centroid[1] + maxR + 12;
+    if (cfg.pos === "left")  lx = centroid[0] - maxR - 5;
+    if (cfg.pos === "right") lx = centroid[0] + maxR + 5;
+
+    g.append("text")
+      .attr("class", "county-label")
+      .attr("x", lx)
+      .attr("y", ly)
+      .attr("text-anchor", cfg.anchor)
+      .attr("dominant-baseline", cfg.pos === "left" || cfg.pos === "right" ? "middle" : "auto")
+      .text(name);
+
+    // Case count inside circle for all active outbreak counties
+    if (data.ob2 > 0) {
+      const r = rScale(data.ob2);
+      g.append("text")
+        .attr("x", centroid[0])
+        .attr("y", centroid[1])
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "central")
+        .attr("font-family", "Arial, Helvetica, sans-serif")
+        .attr("font-size", r > 20 ? "13px" : "11px")
+        .attr("font-weight", "700")
+        .attr("fill", "#7a1a10")
+        .attr("pointer-events", "none")
+        .text(data.ob2);
+    }
+  });
+
+  // Reference cities
+  cities.forEach(city => {
+    const [cx, cy] = projection([city.lon, city.lat]);
+
+    if (city.star) {
+      // Draw a 5-point star for state capital
+      const starPath = d3.symbol().type(d3.symbolStar).size(40)();
+      g.append("path")
+        .attr("d", starPath)
+        .attr("transform", `translate(${cx},${cy})`)
+        .attr("fill", "#555")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 0.5);
+    } else {
+      g.append("circle")
+        .attr("class", "city-dot")
+        .attr("cx", cx)
+        .attr("cy", cy)
+        .attr("r", 3);
+    }
+
+    g.append("text")
+      .attr("class", "city-label")
+      .attr("x", cx + city.dx)
+      .attr("y", cy + city.dy)
+      .attr("text-anchor", city.anchor)
+      .text(city.name);
+  });
+
+
+
+
+}).catch(err => {
+  console.error("Failed to load map:", err);
+});
+
+// Tooltip
+const tooltip = document.getElementById("tooltip");
+
+function showTooltip(event, name, cases) {
+  tooltip.querySelector(".tt-county").textContent = name + " County";
+  tooltip.querySelector(".tt-rows").textContent = cases + " case" + (cases !== 1 ? "s" : "");
+  tooltip.style.opacity = 1;
+  moveTooltip(event);
+}
+
+function moveTooltip(event) {
+  const x = event.clientX, y = event.clientY;
+  const tw = tooltip.offsetWidth;
+  tooltip.style.left = (x + 12 + tw > window.innerWidth ? x - tw - 12 : x + 12) + "px";
+  tooltip.style.top = (y - 10) + "px";
+}
+
+function hideTooltip() { tooltip.style.opacity = 0; }
+</script>
+</body>
+</html>
