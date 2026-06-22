@@ -292,7 +292,7 @@ ul {
 ============================== */
 hr {
   border: none !important;
-  border-top: 2px solid #000000 !important;
+  border-top: 3px solid #000000 !important;
   margin: 5rem 0 0.25rem !important;
   width: 100%;
   opacity: 1 !important;
@@ -358,7 +358,7 @@ main,
 
 
 .honors-table table {
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   line-height: 1.3;
   width: 100%;
   font-family: "Noto Sans", sans-serif;
@@ -382,7 +382,7 @@ main,
   border-top: none;
 }
 .honors-table table tr.year-row td {
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   padding-top: 1.5rem;
   padding-bottom: 0.5rem;
   text-align: left !important;
@@ -395,24 +395,5 @@ main,
   border-top: 0.5px solid rgba(0, 0, 0, 0.25);
 }
 .honors-table table tr.year-row + tr td {
-  padding-top: 0.4rem;
-}
-.honors-table .award-project {
-  display: block;
-  font-size: 0.8rem;
-  color: #707073;
-  margin-top: 0.1rem;
-}
-.honors-table table tr.award-org-row td {
-  padding-top: 0.4rem;
-}
-.honors-table table tr.award-org-row td:first-child,
-.honors-table table tr.award-org-row td:first-child strong {
-  font-weight: 600;
-  color: #303841;
-}
-.honors-table table tbody tr:not(.year-row):not(.award-org-row) td:nth-child(2),
-.honors-table table tbody tr:not(.year-row):not(.award-org-row) td:nth-child(3) {
-  font-size: 0.8rem;
-  color: #707073;
+  padding-top: 0.75rem;
 }
