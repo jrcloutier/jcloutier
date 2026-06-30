@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Page Mockup — Jimmy Cloutier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Mono&display=swap" rel="stylesheet">
+<style>
+
+/* ==============================
+   Reset & base
+============================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --white:     #FFFFFF;
+  --black:     #303841;
+  --blue:      #2185D5;
+  --lightgray: #F3F3F3;
+  --darkgray:  #1F2529;
+  --mid:       #707073;
+}
+
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
+  color: var(--black);
+  background: var(--white);
+  line-height: 1.6;
+}
+
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--mid); }
+
+/* ==============================
+   Navbar
+============================== */
+.navbar {
+  background: var(--white);
+  border-bottom: 0.5px solid lightgray;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-brand {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--black);
+  text-decoration: none;
+}
+.navbar-brand:hover { color: darkgray; }
+
+.navbar-links {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+}
+.navbar-links a {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 1rem;
+  color: var(--black);
+  padding: 0.5rem 1rem;
+  display: block;
+}
+.navbar-links a:hover { color: darkgray; }
+
+/* ==============================
+   Banner
+============================== */
+.project-banner {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  background: var(--darkgray);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Placeholder graphic — replace with <img> for a real photo */
+.banner-graphic {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255,255,255,0.02) 0px,
+      rgba(255,255,255,0.02) 1px,
+      transparent 1px,
+      transparent 12px
+    ),
+    linear-gradient(160deg, #1a2a38 0%, #0f1c28 50%, #1c1013 100%);
+}
+
+/* Accent bar at the top of the banner */
+.banner-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: var(--blue);
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem 2.5rem 2.5rem;
+  max-width: 860px;
+}
+
+.banner-kicker {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 0.6rem;
+}
+
+.banner-title {
+  font-family: "New York", Georgia, "Times New Roman", serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+}
+
+.banner-outlet {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* ==============================
+   Main content
+============================== */
+.page-content {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 4rem;
+  align-items: start;
+}
+
+/* ==============================
+   Left column — description + stories
+============================== */
+.project-description {
+  font-size: 1.1rem;
+  line-height: 1.75;
+  color: var(--darkgray);
+  margin-bottom: 2.75rem;
+  padding-bottom: 2.75rem;
+  border-bottom: 3px solid var(--black);
+}
+
+.stories-label {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--darkgray);
+  margin-bottom: 1.5rem;
+}
+
+.story-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.story-item {
+  padding: 1.25rem 0;
+  border-bottom: 0.5px solid rgba(0,0,0,0.15);
+}
+.story-item:first-child {
+  border-top: 0.5px solid rgba(0,0,0,0.15);
+}
+
+.story-meta {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--darkgray);
+  margin-bottom: 0.3rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.story-title {
+  font-family: "New York", Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1.3;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+.story-title:hover { color: var(--mid); }
+
+.story-desc {
+  font-size: 0.95rem;
+  color: var(--darkgray);
+  line-height: 1.55;
+}
+
+/* ==============================
+   Right column — awards
+============================== */
+.awards-column {
+  position: sticky;
+  top: 4.5rem;
+}
+
+.awards-label {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--darkgray);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid var(--black);
+}
+
+.award-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.award-item {
+  padding: 0.9rem 0;
+  border-bottom: 0.5px solid rgba(0,0,0,0.15);
+}
+
+.award-name {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1.4;
+  margin-bottom: 0.2rem;
+}
+
+.award-org {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 0.75rem;
+  color: var(--mid);
+  line-height: 1.4;
+}
+
+.award-year {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 0.7rem;
+  color: var(--mid);
+  margin-top: 0.15rem;
+}
+
+/* ==============================
+   Responsive
+============================== */
+@media (max-width: 720px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .awards-column {
+    position: static;
+    border-top: 3px solid var(--black);
+    padding-top: 2rem;
+  }
+  .banner-title { font-size: 1.75rem; }
+  .project-banner { height: 260px; }
+  .banner-content { padding: 1.5rem 1.25rem 2rem; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ==============================
+     Navbar
+============================== -->
+<nav class="navbar">
+  <a class="navbar-brand" href="#">Jimmy Cloutier</a>
+  <ul class="navbar-links">
+    <li><a href="#">Work</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+</nav>
+
+<!-- ==============================
+     Banner
+============================== -->
+<div class="project-banner">
+  <div class="banner-graphic"></div>
+  <div class="banner-accent"></div>
+  <div class="banner-content">
+    <p class="banner-kicker">Investigative series</p>
+    <h1 class="banner-title">The Illinois Pension Crisis</h1>
+    <p class="banner-outlet">Chicago Tribune &nbsp;·&nbsp; 2024–2025</p>
+  </div>
+</div>
+
+<!-- ==============================
+     Main content
+============================== -->
+<div class="page-content">
+  <div class="content-grid">
+
+    <!-- Left: description + stories -->
+    <div class="main-column">
+      <p class="project-description">
+        A multi-part investigation into the structural causes and political failures behind Illinois's $200 billion unfunded pension liability — one of the worst in the nation. The series traced how decades of deferred payments, inflated benefit promises, and legislative dysfunction compounded into a fiscal crisis affecting the livelihoods of hundreds of thousands of public workers and retirees.
+      </p>
+
+      <p class="stories-label">Installments</p>
+
+      <ol class="story-list">
+
+        <li class="story-item">
+          <div class="story-meta">
+            <span>Part 1</span>
+            <span>March 14, 2024</span>
+          </div>
+          <a class="story-title" href="#">How Illinois Spent 30 Years Kicking the Can</a>
+          <p class="story-desc">A reconstruction of the legislative decisions that ballooned Illinois's pension debt from manageable to catastrophic.</p>
+        </li>
+
+        <li class="story-item">
+          <div class="story-meta">
+            <span>Part 2</span>
+            <span>April 2, 2024</span>
+          </div>
+          <a class="story-title" href="#">The Beneficiaries: Who Gets What — and Why It's So Hard to Change</a>
+          <p class="story-desc">An analysis of pension benefit structures, spiking practices, and why reforms have failed in court after court.</p>
+        </li>
+
+        <li class="story-item">
+          <div class="story-meta">
+            <span>Part 3</span>
+            <span>May 19, 2024</span>
+          </div>
+          <a class="story-title" href="#">The Local Squeeze: How Pension Debt Is Gutting City Services</a>
+          <p class="story-desc">From Rockford to Chicago's South Side, municipalities are cutting parks, libraries, and staff to make pension payments.</p>
+        </li>
+
+        <li class="story-item">
+          <div class="story-meta">
+            <span>Part 4</span>
+            <span>September 8, 2024</span>
+          </div>
+          <a class="story-title" href="#">Paths Out: What Other States Have Done and Whether It Could Work Here</a>
+          <p class="story-desc">A comparative look at pension reform efforts in New Jersey, Kentucky, and Rhode Island and what lessons Illinois has ignored.</p>
+        </li>
+
+        <li class="story-item">
+          <div class="story-meta">
+            <span>Data analysis</span>
+            <span>Ongoing</span>
+          </div>
+          <a class="story-title" href="#">Track Illinois's Pension Debt Over Time</a>
+          <p class="story-desc">An interactive database of pension fund balances, employer contribution rates, and long-term projections across all five state systems.</p>
+        </li>
+
+      </ol>
+    </div>
+
+    <!-- Right: awards -->
+    <aside class="awards-column">
+      <p class="awards-label">Recognition</p>
+      <ul class="award-list">
+
+        <li class="award-item">
+          <p class="award-name">IRE Award, Public Service</p>
+          <p class="award-org">Investigative Reporters and Editors</p>
+          <p class="award-year">2025 &nbsp;·&nbsp; Winner</p>
+        </li>
+
+        <li class="award-item">
+          <p class="award-name">Goldsmith Prize for Investigative Reporting</p>
+          <p class="award-org">Harvard Kennedy School</p>
+          <p class="award-year">2025 &nbsp;·&nbsp; Finalist</p>
+        </li>
+
+        <li class="award-item">
+          <p class="award-name">Best in Business, Public Policy</p>
+          <p class="award-org">Society of American Business Editors and Writers</p>
+          <p class="award-year">2025 &nbsp;·&nbsp; Winner</p>
+        </li>
+
+        <li class="award-item">
+          <p class="award-name">National Headliner Award</p>
+          <p class="award-org">Press Club of Atlantic City</p>
+          <p class="award-year">2025 &nbsp;·&nbsp; First Place</p>
+        </li>
+
+        <li class="award-item">
+          <p class="award-name">SPJ Sigma Delta Chi Award</p>
+          <p class="award-org">Society of Professional Journalists</p>
+          <p class="award-year">2024 &nbsp;·&nbsp; Finalist</p>
+        </li>
+
+      </ul>
+    </aside>
+
+  </div>
+</div>
+
+</body>
+</html>
