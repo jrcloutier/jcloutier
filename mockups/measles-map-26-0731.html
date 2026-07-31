@@ -307,11 +307,13 @@ function render() {
       .attr('x', cx + city.dx).attr('y', cy + city.dy)
       .attr('text-anchor', city.anchor).text(city.name);
   });
+}
 
-  // Tells the parent frame our true content height, in case it's set up
-  // to listen (e.g. an iframe-auto-resize script) — a harmless no-op
-  // otherwise. Without a listener on the host page, the iframe's height
-  // still has to be set manually to match.
+// Tells the parent frame our true content height, in case it's set up
+// to listen (e.g. an iframe-auto-resize script) — a harmless no-op
+// otherwise. Without a listener on the host page, the iframe's height
+// still has to be set manually to match.
+function reportHeight() {
   if (window.parent !== window) {
     window.parent.postMessage(
       { type: 'pg-measles-embed-resize', height: document.querySelector('.dw-chart').getBoundingClientRect().height },
@@ -331,6 +333,13 @@ async function drawMap() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(render, 150);
   });
+
+  // A ResizeObserver keeps the parent frame's height in sync with ANY
+  // change to the chart's actual size, not just a one-time report right
+  // after load — this covers timing races a single postMessage call
+  // misses, like a web font finishing its swap (and reflowing text)
+  // after the chart's first paint.
+  new ResizeObserver(reportHeight).observe(document.querySelector('.dw-chart'));
 }
 
 drawMap();
