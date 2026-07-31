@@ -23,7 +23,7 @@
   #pg-measles-weekly {
     margin: 0 auto;
     font-family: 'Roboto', Arial, sans-serif;
-    padding: 16px;
+    padding: 16px 0 12px;
   }
   .pg-weekly-hed {
     font-size: 22px;
@@ -262,6 +262,17 @@ function draw() {
   legend.append('line').attr('x1', 120).attr('x2', 132).attr('y1', 6).attr('y2', 6).attr('stroke', '#1a1a1a').attr('stroke-width', 2);
   legend.append('circle').attr('cx', 126).attr('cy', 6).attr('r', 3).attr('fill', '#1a1a1a');
   legend.append('text').attr('x', 136).attr('y', 10).attr('font-family', "'Roboto', Arial, sans-serif").attr('font-size', '12px').attr('fill', '#555').text('Cumulative cases');
+
+  // Tells the parent frame our true content height, in case it's set up
+  // to listen (e.g. an iframe-auto-resize script) — a harmless no-op
+  // otherwise. Without a listener on the host page, the iframe's height
+  // still has to be set manually to match.
+  if (window.parent !== window) {
+    window.parent.postMessage(
+      { type: 'pg-measles-embed-resize', height: container.getBoundingClientRect().height },
+      '*'
+    );
+  }
 }
 
 draw();
