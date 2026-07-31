@@ -25,7 +25,6 @@
   }
 
   .dw-chart {
-    max-width: 600px;
     margin: 0 auto;
     padding: 16px 0 12px;
   }
@@ -171,12 +170,6 @@ const cities = [
   { name: "Pittsburgh",   lon: -79.9959, lat: 40.4406, anchor: "start", dx: 6,  dy: 4,  star: false },
 ];
 
-// Matches the SVG's viewBox to its actual rendered width (rather than a
-// fixed design-time constant) so text and marks inside the SVG render at
-// their true CSS pixel size instead of being scaled by the ratio between
-// a hardcoded viewBox and the container's real width.
-const VIEW_W = document.querySelector('.dw-chart').getBoundingClientRect().width || 680;
-
 const tip = document.getElementById('tooltip');
 function showTip(e, county, cases) {
   tip.querySelector('.tt-county').textContent = county + ' County';
@@ -190,10 +183,15 @@ function moveTip(e) {
 }
 function hideTip() { tip.style.display = 'none'; }
 
-async function drawMap() {
-  const us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json');
-  const paCounties = topojson.feature(us, us.objects.counties);
-  paCounties.features = paCounties.features.filter(d => d.id.toString().startsWith('42'));
+let paCounties = null;
+
+// The county topology is fetched once; render() redraws from that cached
+// copy on resize instead of re-fetching. VIEW_W is re-measured inside
+// render() (not hoisted to a one-time constant) so the map — and every
+// label size inside it — redraws at true scale instead of the browser
+// uniformly shrinking a viewBox frozen at the load-time width.
+function render() {
+  const VIEW_W = document.querySelector('.dw-chart').getBoundingClientRect().width || 680;
 
   // Fills the canvas width edge-to-edge with NO distortion — a single
   // uniform scale factor (k) is used for both x and y, so true state
@@ -232,6 +230,7 @@ async function drawMap() {
   const rScale = v => Math.max(8, rScaleRaw(v));
 
   const svg = d3.select('#map-svg');
+  svg.selectAll('*').remove();
   const g   = svg.append('g');
 
   // Hatch pattern
@@ -307,6 +306,30 @@ async function drawMap() {
     g.append('text').attr('class', 'city-label')
       .attr('x', cx + city.dx).attr('y', cy + city.dy)
       .attr('text-anchor', city.anchor).text(city.name);
+  });
+
+  // Tells the parent frame our true content height, in case it's set up
+  // to listen (e.g. an iframe-auto-resize script) — a harmless no-op
+  // otherwise. Without a listener on the host page, the iframe's height
+  // still has to be set manually to match.
+  if (window.parent !== window) {
+    window.parent.postMessage(
+      { type: 'pg-measles-embed-resize', height: document.querySelector('.dw-chart').getBoundingClientRect().height },
+      '*'
+    );
+  }
+}
+
+async function drawMap() {
+  const us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json');
+  paCounties = topojson.feature(us, us.objects.counties);
+  paCounties.features = paCounties.features.filter(d => d.id.toString().startsWith('42'));
+  render();
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(render, 150);
   });
 }
 
