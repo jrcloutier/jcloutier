@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pennsylvania measles map</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/*
+ * DATAWRAPPER-STYLE TYPOGRAPHY — applies to all visualizations/ embeds.
+ * Font: Roboto (fallback Arial/sans-serif). Body/annotation/label text
+ * capped at two sizes — 14px primary (near-black), 12px secondary (gray).
+ * Regular weight for body text; bold reserved for titles and emphasis.
+ * Sentence case throughout. See measles_scraper.R comments for source.
+ */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #fff;
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+
+  .dw-chart {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px 0 12px;
+  }
+
+  .dw-title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #1a1a1a;
+    margin-bottom: 7px;
+  }
+
+  .dw-description {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
+    margin-bottom: 14px;
+  }
+
+  .dw-legend {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    color: #555;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1.5px solid #a93226;
+    background: repeating-linear-gradient(135deg, transparent, transparent 2px, rgba(169,50,38,0.25) 2px, rgba(169,50,38,0.25) 3px), #f0ddd5;
+    flex-shrink: 0;
+  }
+
+  .legend-circle.inactive {
+    border-color: #999;
+    background: repeating-linear-gradient(135deg, transparent, transparent 2px, rgba(120,120,120,0.4) 2px, rgba(120,120,120,0.4) 3px), #dedede;
+  }
+
+  #map-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .dw-source {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+
+  .dw-dot {
+    font-size: 15px;
+    vertical-align: -1px;
+    margin: 0 1px;
+  }
+
+  .county          { fill: #efefef; stroke: #fff; stroke-width: 0.75px; }
+  .county.affected { fill: url(#hatch-active); }
+  .county.affected.inactive { fill: url(#hatch-inactive); }
+  .bubble          { stroke-width: 1px; fill-opacity: 0.12; cursor: pointer; transition: fill-opacity 0.1s; }
+  .bubble.active   { fill: #a93226; stroke: #a93226; }
+  .bubble.inactive { fill: #888; stroke: #888; }
+  .bubble:hover    { fill-opacity: 0.45; }
+
+  #tooltip {
+    position: fixed;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 9px 12px;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    display: none;
+    z-index: 100;
+  }
+  #tooltip .tt-county { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  #tooltip .tt-outbreak { font-size: 12px; color: #888; margin-bottom: 2px; }
+  #tooltip .tt-cases { color: #333; }
+  .county-label    { font-family: 'Roboto', Arial, sans-serif; font-size: 12px; font-weight: 400; fill: #222; pointer-events: none; }
+  .case-count-label{ pointer-events: none; }
+  .city-dot        { fill: #555; stroke: #fff; stroke-width: 1px; }
+  .city-label      { font-family: 'Roboto', Arial, sans-serif; font-size: 12px; fill: #444; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div class="dw-chart">
+  <h3 class="dw-title" id="dw-title"></h3>
+  <p class="dw-description" id="dw-description"></p>
+
+  <div class="dw-legend">
+    <div class="legend-item">
+      <div class="legend-circle"></div>
+      <span>Current outbreak (cases since late April)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-circle inactive"></div>
+      <span>Prior outbreak (January – March)</span>
+    </div>
+  </div>
+
+  <svg id="map-svg" viewBox="0 0 680 416"></svg>
+
+  <p class="dw-source">Map: Jimmy Cloutier / Post-Gazette <span class="dw-dot">&bull;</span> Source: Pennsylvania Department of Health, as of <span id="dw-asof"></span></p>
+</div>
+
+<div id="tooltip">
+  <div class="tt-county"></div>
+  <div class="tt-outbreak"></div>
+  <div class="tt-cases"></div>
+</div>
+
+<script>
+/* SCRAPER-DATA-START */
+  const totalCases = 158;
+  const currentOb = 146;
+  const priorOb = 12;
+  const lastUpdated = "July 29, 2026";
+  const caseData = {
+  "Bedford": { ob1: 0, ob2: 1 },
+  "Berks": { ob1: 0, ob2: 4 },
+  "Chester": { ob1: 1, ob2: 16 },
+  "Dauphin": { ob1: 0, ob2: 2 },
+  "Indiana": { ob1: 0, ob2: 3 },
+  "Lancaster": { ob1: 8, ob2: 84 },
+  "Lebanon": { ob1: 0, ob2: 20 },
+  "Mifflin": { ob1: 0, ob2: 1 },
+  "Montgomery": { ob1: 3, ob2: 0 },
+  "Northumberland": { ob1: 0, ob2: 7 },
+  "Perry": { ob1: 0, ob2: 1 },
+  "Snyder": { ob1: 0, ob2: 1 },
+  "York": { ob1: 0, ob2: 6 }
+  };
+/* SCRAPER-DATA-END */
+
+const countyCount = Object.keys(caseData).length;
+document.getElementById('dw-title').textContent =
+  `Measles has spread to more than a dozen counties`;
+document.getElementById('dw-description').textContent =
+  `Lancaster County has been the epicenter of two outbreaks this year — an early surge in cases that started in January and ended two months later, and an ongoing outbreak that began in April. Cases have since spread to ${countyCount} counties.`;
+document.getElementById('dw-asof').textContent = lastUpdated;
+
+const paFips = {
+  "42001":"Adams","42003":"Allegheny","42005":"Armstrong","42007":"Beaver",
+  "42009":"Bedford","42011":"Berks","42013":"Blair","42015":"Bradford",
+  "42017":"Bucks","42019":"Butler","42021":"Cambria","42023":"Cameron",
+  "42025":"Carbon","42027":"Centre","42029":"Chester","42031":"Clarion",
+  "42033":"Clearfield","42035":"Clinton","42037":"Columbia","42039":"Crawford",
+  "42041":"Cumberland","42043":"Dauphin","42045":"Delaware","42047":"Elk",
+  "42049":"Erie","42051":"Fayette","42053":"Forest","42055":"Franklin",
+  "42057":"Fulton","42059":"Greene","42061":"Huntingdon","42063":"Indiana",
+  "42065":"Jefferson","42067":"Juniata","42069":"Lackawanna","42071":"Lancaster",
+  "42073":"Lawrence","42075":"Lebanon","42077":"Lehigh","42079":"Luzerne",
+  "42081":"Lycoming","42083":"McKean","42085":"Mercer","42087":"Mifflin",
+  "42089":"Monroe","42091":"Montgomery","42093":"Montour","42095":"Northampton",
+  "42097":"Northumberland","42099":"Perry","42101":"Philadelphia","42103":"Pike",
+  "42105":"Potter","42107":"Schuylkill","42109":"Snyder","42111":"Somerset",
+  "42113":"Sullivan","42115":"Susquehanna","42117":"Tioga","42119":"Union",
+  "42121":"Venango","42123":"Warren","42125":"Washington","42127":"Wayne",
+  "42129":"Westmoreland","42131":"Wyoming","42133":"York"
+};
+
+const labelConfig = {
+  "Lancaster": { anchor: "middle", dx: 0, dy: 1,  pos: "below" },
+  "Lebanon":   { anchor: "middle", dx: 0, dy: -1, pos: "above" },
+};
+
+const cities = [
+  { name: "Philadelphia", lon: -75.1652, lat: 39.9526, anchor: "start", dx: 6,  dy: 4,  star: false },
+  { name: "Harrisburg",   lon: -76.8844, lat: 40.2732, anchor: "end",   dx: -6, dy: 4,  star: true  },
+  { name: "Pittsburgh",   lon: -79.9959, lat: 40.4406, anchor: "start", dx: 6,  dy: 4,  star: false },
+];
+
+// Matches the SVG's viewBox to its actual rendered width (rather than a
+// fixed design-time constant) so text and marks inside the SVG render at
+// their true CSS pixel size instead of being scaled by the ratio between
+// a hardcoded viewBox and the container's real width.
+const VIEW_W = document.querySelector('.dw-chart').getBoundingClientRect().width || 680;
+
+const tip = document.getElementById('tooltip');
+function showTip(e, county, cases, outbreakLabel) {
+  tip.querySelector('.tt-county').textContent = county + ' County';
+  tip.querySelector('.tt-outbreak').textContent = outbreakLabel;
+  tip.querySelector('.tt-cases').textContent = cases + ' case' + (cases !== 1 ? 's' : '');
+  tip.style.display = 'block';
+  moveTip(e);
+}
+function moveTip(e) {
+  tip.style.left = (e.clientX + 14) + 'px';
+  tip.style.top  = (e.clientY - 12) + 'px';
+}
+function hideTip() { tip.style.display = 'none'; }
+
+function isInactive(d) { return d.ob1 > 0 && d.ob2 === 0; }
+
+async function drawMap() {
+  const us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json');
+  const paCounties = topojson.feature(us, us.objects.counties);
+  paCounties.features = paCounties.features.filter(d => d.id.toString().startsWith('42'));
+
+  // Fills the canvas width edge-to-edge with NO distortion — a single
+  // uniform scale factor (k) is used for both x and y, so true state
+  // proportions are preserved. The canvas height then isn't fixed in
+  // advance; it's computed below from however tall the state turns out
+  // to be at that scale, so there's no leftover top/bottom margin either.
+  const raw = d3.geoMercator().scale(1).translate([0, 0]);
+  const rawPath = d3.geoPath().projection(raw);
+  const [[x0, y0], [x1, y1]] = rawPath.bounds(paCounties);
+
+  const padLeft = 4, padRight = 25, padTop = 8, padBottom = 30;
+  const k = (VIEW_W - padLeft - padRight) / (x1 - x0);
+  const tx = padLeft - k * x0;
+  const ty = padTop - k * y0;
+  const VIEW_H = padTop + k * (y1 - y0) + padBottom;
+  d3.select('#map-svg').attr('viewBox', `0 0 ${VIEW_W} ${VIEW_H}`);
+
+  function projectPoint(lon, lat) {
+    const [x, y] = raw([lon, lat]);
+    return [x * k + tx, y * k + ty];
+  }
+
+  const projection = d3.geoTransform({
+    point(x, y) {
+      const [px, py] = projectPoint(x, y);
+      this.stream.point(px, py);
+    }
+  });
+
+  const path = d3.geoPath().projection(projection);
+  const maxCases = d3.max(Object.values(caseData), d => Math.max(d.ob1, d.ob2));
+  // Floored so single-digit counts (e.g. "1") still get a bubble large
+  // enough to hold their label legibly — otherwise the sqrt scale alone
+  // shrinks them to a few pixels.
+  const rScaleRaw = d3.scaleSqrt().domain([0, maxCases]).range([0, 48]);
+  const rScale = v => Math.max(8, rScaleRaw(v));
+
+  const svg = d3.select('#map-svg');
+  const g   = svg.append('g');
+
+  // Hatch patterns
+  const defs = svg.append('defs');
+  defs.append('pattern')
+    .attr('id', 'hatch-active')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 6).attr('height', 6)
+    .attr('patternTransform', 'rotate(45)')
+    .call(p => p.append('rect').attr('width', 6).attr('height', 6).attr('fill', '#f0ddd5'))
+    .call(p => p.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 6)
+      .attr('stroke', '#e0b8a8').attr('stroke-width', 1));
+  defs.append('pattern')
+    .attr('id', 'hatch-inactive')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 6).attr('height', 6)
+    .attr('patternTransform', 'rotate(45)')
+    .call(p => p.append('rect').attr('width', 6).attr('height', 6).attr('fill', '#dedede'))
+    .call(p => p.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 6)
+      .attr('stroke', '#aaaaaa').attr('stroke-width', 1));
+
+  // Counties
+  g.selectAll('.county')
+    .data(paCounties.features)
+    .join('path')
+    .attr('class', d => {
+      const name = paFips[d.id];
+      if (!name || !caseData[name]) return 'county';
+      const inactive = isInactive(caseData[name]);
+      return inactive ? 'county affected inactive' : 'county affected';
+    })
+    .attr('d', path);
+
+  // Bubbles + labels
+  Object.entries(caseData).forEach(([name, data]) => {
+    const feature = paCounties.features.find(f => paFips[f.id] === name);
+    if (!feature) return;
+    const centroid = path.centroid(feature);
+    const outbreaks = [
+      { cases: data.ob1, cls: 'inactive' },
+      { cases: data.ob2, cls: 'active'   },
+    ].sort((a, b) => b.cases - a.cases);
+
+    outbreaks.forEach(ob => {
+      if (ob.cases === 0) return;
+      const r = rScale(ob.cases);
+      const label = ob.cls === 'active' ? 'Current outbreak (since late April)' : 'Prior outbreak (January – March)';
+      g.append('circle')
+        .attr('class', `bubble ${ob.cls}`)
+        .attr('cx', centroid[0]).attr('cy', centroid[1]).attr('r', r)
+        .on('mouseover', e => showTip(e, name, ob.cases, label))
+        .on('mousemove', moveTip)
+        .on('mouseout', hideTip);
+    });
+
+    // Case count labels
+    const labelObs = outbreaks.filter(o => o.cases > 0);
+    labelObs.forEach((ob, i) => {
+      const r = rScale(ob.cases);
+      let ly = centroid[1];
+      if (labelObs.length > 1 && i === 0) {
+        const rInner = rScale(labelObs[1].cases);
+        ly = centroid[1] - (r + rInner) / 2;
+      }
+      g.append('text').attr('class', 'case-count-label')
+        .attr('x', centroid[0]).attr('y', ly)
+        .attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+        .attr('font-family', "'Roboto', Arial, sans-serif")
+        .attr('font-size', r > 25 ? '14px' : '12px')
+        .attr('font-weight', '700').attr('fill', ob.cls === 'active' ? '#7a1a10' : '#444')
+        .text(ob.cases);
+    });
+
+    // County labels
+    const cfg = labelConfig[name];
+    if (!cfg) return;
+    const maxR = rScale(Math.max(data.ob1, data.ob2, 1));
+    let lx = centroid[0] + cfg.dx, ly = centroid[1] + cfg.dy;
+    if (cfg.pos === 'above') ly = centroid[1] - maxR - 5;
+    if (cfg.pos === 'below') ly = centroid[1] + maxR + 12;
+    if (cfg.pos === 'left')  lx = centroid[0] - maxR - 5;
+    if (cfg.pos === 'right') lx = centroid[0] + maxR + 5;
+    g.append('text').attr('class', 'county-label')
+      .attr('x', lx).attr('y', ly).attr('text-anchor', cfg.anchor)
+      .attr('dominant-baseline', cfg.pos === 'left' || cfg.pos === 'right' ? 'middle' : 'auto')
+      .text(name);
+  });
+
+  // City markers
+  cities.forEach(city => {
+    const [cx, cy] = projectPoint(city.lon, city.lat);
+    if (city.star) {
+      const starPath = d3.symbol().type(d3.symbolStar).size(40)();
+      g.append('path').attr('d', starPath)
+        .attr('transform', `translate(${cx},${cy})`)
+        .attr('fill', '#555').attr('stroke', '#fff').attr('stroke-width', 0.5);
+    } else {
+      g.append('circle').attr('class', 'city-dot')
+        .attr('cx', cx).attr('cy', cy).attr('r', 3);
+    }
+    g.append('text').attr('class', 'city-label')
+      .attr('x', cx + city.dx).attr('y', cy + city.dy)
+      .attr('text-anchor', city.anchor).text(city.name);
+  });
+}
+
+drawMap();
+</script>
+</body>
+</html>
