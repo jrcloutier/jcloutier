@@ -312,13 +312,9 @@ function render() {
   // to listen (e.g. an iframe-auto-resize script) — a harmless no-op
   // otherwise. Without a listener on the host page, the iframe's height
   // still has to be set manually to match.
-  var measuredHeight = document.querySelector('.dw-chart').getBoundingClientRect().height;
-  console.log('[MEASLES-RESIZE] in-iframe: window.parent !== window ?', window.parent !== window);
-  console.log('[MEASLES-RESIZE] in-iframe: measured height =', measuredHeight);
   if (window.parent !== window) {
-    console.log('[MEASLES-RESIZE] in-iframe: posting message now');
     window.parent.postMessage(
-      { type: 'pg-measles-embed-resize', height: measuredHeight },
+      { type: 'pg-measles-embed-resize', height: document.querySelector('.dw-chart').getBoundingClientRect().height },
       '*'
     );
   }
