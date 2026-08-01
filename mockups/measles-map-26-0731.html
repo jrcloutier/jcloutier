@@ -46,7 +46,6 @@
 
   #map-svg {
     width: 100%;
-    height: auto;
     display: block;
   }
 
@@ -218,7 +217,15 @@ function render() {
   const tx = padLeft - k * x0;
   const ty = padTop - k * y0;
   const VIEW_H = padTop + k * (y1 - y0) + padBottom;
-  d3.select('#map-svg').attr('viewBox', `0 0 ${VIEW_W} ${VIEW_H}`);
+  // Explicit width/height attributes (not just viewBox + CSS height:auto)
+  // — matching the weekly/bar charts, which set these directly via JS
+  // rather than leaving the browser to infer height from the aspect
+  // ratio. Relying on "auto" intrinsic sizing was the one place this
+  // template diverged from the other embeds that never had this bug.
+  d3.select('#map-svg')
+    .attr('viewBox', `0 0 ${VIEW_W} ${VIEW_H}`)
+    .attr('width', VIEW_W)
+    .attr('height', VIEW_H);
 
   function projectPoint(lon, lat) {
     const [x, y] = raw([lon, lat]);
