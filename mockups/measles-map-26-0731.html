@@ -356,6 +356,18 @@ function drawMap() {
   // misses, like a web font finishing its swap (and reflowing text)
   // after the chart's first paint.
   new ResizeObserver(reportHeight).observe(document.querySelector('.dw-chart'));
+
+  // Belt-and-braces on top of the ResizeObserver: re-send the height on
+  // a plain timer for the first few seconds after load, the same way
+  // production embed libraries (Datawrapper's included) do. This defeats
+  // any one-off timing race we haven't diagnosed — mobile Safari's
+  // handling of a lazy-loaded iframe's initial layout, in particular —
+  // regardless of its exact cause.
+  let reportTries = 0;
+  const reportTimer = setInterval(() => {
+    reportHeight();
+    if (++reportTries >= 20) clearInterval(reportTimer);
+  }, 500);
 }
 
 drawMap();
