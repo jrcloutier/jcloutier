@@ -161,55 +161,100 @@ function draw() {
     .call(ax => ax.selectAll('line').attr('stroke', '#eee').attr('stroke-dasharray', '2,2').attr('x2', w))
     .call(ax => ax.selectAll('text').attr('font-family', "'Roboto', Arial, sans-serif").attr('font-size', '12px').attr('fill', '#888'));
 
-  // x-axis with "Apr 20" style labels — only a handful of ticks, spaced
-  // out across the data, so labels don't collide as more weeks accumulate.
+  // "Jan 26" style formatter — still used for tooltips, even though the
+  // axis itself now shows month names rather than individual dates.
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const fmtWeek = d => `${months[d.getUTCMonth()]} ${d.getUTCDate()}`;
-  // Evenly-spaced indices across the full array (rather than a fixed
-  // step-size with the last point forced in) — a modulo step doesn't
-  // usually divide the array length evenly, which crowds the final two
-  // ticks together as more weeks accumulate.
-  const desiredTicks = 8;
-  const tickCount = Math.min(desiredTicks, weeklyData.length);
-  const tickValues = Array.from({ length: tickCount }, (_, i) =>
-    Math.round(i * (weeklyData.length - 1) / (tickCount - 1))
-  ).map(i => parseWeek(weeklyData[i].week_start));
+
+  // x-axis: AP-style month labels — abbreviated for longer names (Jan,
+  // Feb), spelled out for short ones (March, April, May, June, July) —
+  // each centered under its own month's span, plus small unlabeled tick
+  // marks at each week for visual rhythm. Matches the newsroom's standard
+  // axis style rather than labeling individual dates.
+  const apMonths = ['Jan','Feb','March','April','May','June','July','Aug','Sept','Oct','Nov','Dec'];
+
+  // Minor weekly tick marks — no text, just a short mark per week.
   g.append('g').attr('transform', `translate(0,${h})`)
-    .call(d3.axisBottom(x).tickSize(0).tickPadding(6).tickValues(tickValues).tickFormat(fmtWeek))
+    .call(d3.axisBottom(x).tickValues(weekDates).tickFormat('').tickSize(5))
     .call(ax => ax.select('.domain').attr('stroke', '#ccc'))
-    .call(ax => ax.selectAll('text').attr('font-family', "'Roboto', Arial, sans-serif").attr('font-size', '12px').attr('fill', '#888'))
-    .call(ax => {
-      // Safety pass on top of the even-spacing heuristic above: measure
-      // each tick label's actual rendered box and drop any that would
-      // still collide with a kept neighbor — guarantees no overlap even
-      // at narrow (mobile) widths the heuristic alone doesn't anticipate.
-      // The first and last ticks are always kept (the outbreak's start
-      // and most recent week are the two most load-bearing dates on this
-      // chart), even if that means the two end labels sit close together.
-      const nodes = ax.selectAll('text').nodes();
-      if (nodes.length > 0) {
-        const keep = new Set([0, nodes.length - 1]);
-        let lastRight = nodes[0].getBBox().x + nodes[0].getBBox().width;
-        for (let i = 1; i < nodes.length - 1; i++) {
-          const bbox = nodes[i].getBBox();
-          if (bbox.x > lastRight + 4) {
-            keep.add(i);
-            lastRight = bbox.x + bbox.width;
-          }
-        }
-        const lastBBox = nodes[nodes.length - 1].getBBox();
-        for (let i = nodes.length - 2; i > 0; i--) {
-          if (!keep.has(i)) continue;
-          const bbox = nodes[i].getBBox();
-          if (bbox.x + bbox.width > lastBBox.x - 4) {
-            keep.delete(i);
-          } else {
-            break;
-          }
-        }
-        nodes.forEach((node, i) => { if (!keep.has(i)) d3.select(node).remove(); });
+    .call(ax => ax.selectAll('line').attr('stroke', '#ccc'));
+
+  // Major month labels, centered on each month's span as clipped to the
+  // visible domain — independent of any single tick position, so a
+  // partial first/last month still centers correctly within its
+  // (shorter) visible slice. Month *boundaries* (the transitions between
+  // consecutive months, not the very first/last edge) get a taller
+  // divider line than the weekly ticks, to visually separate months —
+  // matching the reference chart's look.
+  // A raw calendar month-start rarely lines up with a week boundary, so
+  // snapping a divider there would cut straight through whichever bar
+  // happens to sit at that date. Instead, each divider is placed at the
+  // midpoint between the two weeks it falls between — which is exactly
+  // where the natural gap between two adjacent bars already is.
+  const boundaryBetweenWeeks = target => {
+    for (let i = 0; i < weekDates.length - 1; i++) {
+      if (weekDates[i] <= target && target < weekDates[i + 1]) {
+        return new Date((weekDates[i].getTime() + weekDates[i + 1].getTime()) / 2);
       }
-    });
+    }
+    return target < weekDates[0] ? weekDates[0] : weekDates[weekDates.length - 1];
+  };
+
+  const monthSpans = [];
+  const monthBoundaries = [];
+  let curMonth = new Date(Date.UTC(domainStart.getUTCFullYear(), domainStart.getUTCMonth(), 1));
+  let isFirstMonth = true;
+  while (curMonth < domainEnd) {
+    if (!isFirstMonth) monthBoundaries.push(boundaryBetweenWeeks(curMonth));
+    isFirstMonth = false;
+    const nextMonth = new Date(Date.UTC(curMonth.getUTCFullYear(), curMonth.getUTCMonth() + 1, 1));
+    const spanStart = curMonth < domainStart ? domainStart : curMonth;
+    const spanEnd = nextMonth > domainEnd ? domainEnd : nextMonth;
+    monthSpans.push({ month: curMonth.getUTCMonth(), center: new Date((spanStart.getTime() + spanEnd.getTime()) / 2) });
+    curMonth = nextMonth;
+  }
+
+  g.selectAll('.month-boundary').data(monthBoundaries).join('line')
+    .attr('class', 'month-boundary')
+    .attr('x1', d => x(d)).attr('x2', d => x(d))
+    .attr('y1', h).attr('y2', h + 18)
+    .attr('stroke', '#ccc');
+
+  const monthLabels = g.selectAll('.month-label').data(monthSpans).join('text')
+    .attr('class', 'month-label')
+    .attr('x', d => x(d.center))
+    .attr('y', h + 22)
+    .attr('text-anchor', 'middle')
+    .attr('font-family', "'Roboto', Arial, sans-serif").attr('font-size', '12px').attr('fill', '#888')
+    .text(d => apMonths[d.month]);
+
+  // Safety pass: drop a month label if it would still collide with a
+  // kept neighbor (rare with ~4 weeks between months, but a narrow
+  // embed could squeeze two adjacent short months together). First and
+  // last are always kept.
+  const monthNodes = monthLabels.nodes();
+  if (monthNodes.length > 0) {
+    const keep = new Set([0, monthNodes.length - 1]);
+    let lastRight = monthNodes[0].getBBox().x + monthNodes[0].getBBox().width;
+    for (let i = 1; i < monthNodes.length - 1; i++) {
+      const bbox = monthNodes[i].getBBox();
+      if (bbox.x > lastRight + 4) {
+        keep.add(i);
+        lastRight = bbox.x + bbox.width;
+      }
+    }
+    const lastBBox = monthNodes[monthNodes.length - 1].getBBox();
+    for (let i = monthNodes.length - 2; i > 0; i--) {
+      if (!keep.has(i)) continue;
+      const bbox = monthNodes[i].getBBox();
+      if (bbox.x + bbox.width > lastBBox.x - 4) {
+        keep.delete(i);
+      } else {
+        break;
+      }
+    }
+    monthNodes.forEach((node, i) => { if (!keep.has(i)) d3.select(node).remove(); });
+  }
 
   // Bars — weekly new cases
   g.selectAll('.wbar').data(weeklyData).join('rect')
@@ -326,11 +371,13 @@ function draw() {
   legend.append('line').attr('x1', 120).attr('x2', 132).attr('y1', 6).attr('y2', 6).attr('stroke', '#1a1a1a').attr('stroke-width', 2);
   legend.append('circle').attr('cx', 126).attr('cy', 6).attr('r', 3).attr('fill', '#1a1a1a');
   legend.append('text').attr('x', 136).attr('y', 10).attr('font-family', "'Roboto', Arial, sans-serif").attr('font-size', '12px').attr('fill', '#555').text('Cumulative cases');
+}
 
-  // Tells the parent frame our true content height, in case it's set up
-  // to listen (e.g. an iframe-auto-resize script) — a harmless no-op
-  // otherwise. Without a listener on the host page, the iframe's height
-  // still has to be set manually to match.
+// Tells the parent frame our true content height, in case it's set up
+// to listen (e.g. an iframe-auto-resize script) — a harmless no-op
+// otherwise. Without a listener on the host page, the iframe's height
+// still has to be set manually to match.
+function reportHeight() {
   if (window.parent !== window) {
     window.parent.postMessage(
       { type: 'pg-measles-embed-resize', height: container.getBoundingClientRect().height },
@@ -345,6 +392,23 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(draw, 150);
 });
+
+// A ResizeObserver keeps the parent frame's height in sync with ANY
+// change to the chart's actual size, not just a one-time report right
+// after load — this covers timing races a single postMessage call
+// misses, like a web font finishing its swap (and reflowing text)
+// after the chart's first paint.
+new ResizeObserver(reportHeight).observe(container);
+
+// Belt-and-braces on top of the ResizeObserver: re-send the height on a
+// plain timer for the first few seconds after load, the same way
+// production embed libraries (Datawrapper's included) do — a backstop
+// against any timing race regardless of its exact cause.
+let reportTries = 0;
+const reportTimer = setInterval(() => {
+  reportHeight();
+  if (++reportTries >= 20) clearInterval(reportTimer);
+}, 500);
 })();
 </script>
 </body>
