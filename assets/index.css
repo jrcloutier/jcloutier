@@ -36,7 +36,8 @@ h1 {
 
 /* heading 3 */
 h3 {
-  margin-top: 5px;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   font-size: 1.3rem;
 }
 
