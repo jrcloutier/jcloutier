@@ -247,38 +247,47 @@ div.quarto-post a {
 .contact-list {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 0;
   margin-top: 1.5rem;
 }
 .contact-item {
   font-family: "Noto Sans", sans-serif;
   font-size: 0.95rem;
-  color: #1F2529;
-  margin-bottom: 0.5rem !important;
+  color: #333A3F;
+  margin-bottom: 0.65rem !important;
 }
 .contact-item p {
   margin: 0 !important;
 }
 .contact-item a {
-  color: #1F2529 !important;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: fit-content;
+  padding: 0.2rem 0.65rem 0.2rem 0.2rem;
+  border-radius: 999px;
+  color: #333A3F !important;
   text-decoration: none !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 .contact-item a:hover {
-  text-decoration: underline !important;
+  background-color: #F5F5F5 !important;
+  color: #333A3F !important;
 }
 .contact-icon {
-  width: 2.1em;
-  height: 2.1em;
-  background-color: #F3F3F3;
+  width: 2em;
+  height: 2em;
+  background-color: #4A4F54;
   border-radius: 50%;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0;
-  font-size: 0.95rem;
-  color: #1F2529;
+  font-size: 0.9rem;
+  color: #FFFFFF;
   vertical-align: middle;
-  margin-right: 0.75rem;
+  margin-right: 0.65rem;
 }
 
 /* ==============================
