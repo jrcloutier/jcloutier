@@ -56,14 +56,22 @@
     line-height: 1.4;
   }
 
+  .dw-note {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
   .dw-dot {
     font-size: 15px;
     vertical-align: -1px;
     margin: 0 1px;
   }
 
-  .county          { fill: #efefef; stroke: #fff; stroke-width: 0.75px; }
-  .county.affected { fill: url(#hatch-active); }
+  .county             { fill: #efefef; stroke: #fff; stroke-width: 0.75px; }
+  .county.affected    { fill: url(#hatch-active); }
+  .county.unconfirmed { fill: url(#hatch-unconfirmed); }
   .bubble          { stroke-width: 1px; fill: #a93226; stroke: #a93226; fill-opacity: 0.12; cursor: pointer; transition: fill-opacity 0.1s; }
   .bubble:hover    { fill-opacity: 0.45; }
 
@@ -102,6 +110,7 @@
 
   <svg id="map-svg" viewBox="0 0 680 416"></svg>
 
+  <p class="dw-note">Note: The Allegheny County Health Department has not confirmed the county of residence of the patient being treated by UPMC.</p>
   <p class="dw-source">Map: Jimmy Cloutier / Post-Gazette <span class="dw-dot">&bull;</span> Source: Pennsylvania Department of Health, as of <span id="dw-asof"></span></p>
 </div>
 
@@ -112,10 +121,9 @@
 
 <script>
 /* SCRAPER-DATA-START */
-  const totalCases = 341;
-  const lastUpdated = "August 20, 2026";
+  const totalCases = 340;
+  const lastUpdated = "August 19, 2026";
   const caseData = {
-  "Allegheny": 1,
   "Bedford": 2,
   "Berks": 4,
   "Centre": 10,
@@ -146,11 +154,19 @@
   };
 /* SCRAPER-DATA-END */
 
+// Counties reported in the news but not yet assigned a county of
+// residence by PDOH — shown on the map as a plain yellow fill with no
+// case bubble/number, since we don't have a confirmed count for them.
+// Kept outside the SCRAPER-DATA markers (and out of caseData) so the
+// scraper's automated writes never touch it and it isn't counted toward
+// totalCases/countyCount. Maintained by hand — see the note below the map.
+const unconfirmedCounties = ["Allegheny"];
+
 const countyCount = Object.keys(caseData).length;
 document.getElementById('dw-title').textContent =
-  `Widening measles outbreak reaches Allegheny County`;
+  `Measles cases reported in more than two dozen counties as outbreak widens`;
 document.getElementById('dw-description').textContent =
-  `At least ${totalCases} measles cases have been confirmed in ${countyCount} counties across Pennsylvania since the start of the year — the highest number in more than three decades.`;
+  `As of Aug. 19, Pennsylvania state health officials have confirmed ${totalCases} measles cases in ${countyCount} counties — the highest number in more than three decades.`;
 document.getElementById('dw-asof').textContent = lastUpdated;
 
 const paFips = {
@@ -277,12 +293,22 @@ function render() {
     .call(p => p.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 6)
       .attr('stroke', '#e0b8a8').attr('stroke-width', 1));
 
+  defs.append('pattern')
+    .attr('id', 'hatch-unconfirmed')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 6).attr('height', 6)
+    .attr('patternTransform', 'rotate(45)')
+    .call(p => p.append('rect').attr('width', 6).attr('height', 6).attr('fill', '#f5e9c4'))
+    .call(p => p.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 6)
+      .attr('stroke', '#e0c250').attr('stroke-width', 1));
+
   // Counties
   g.selectAll('.county')
     .data(paCounties.features)
     .join('path')
     .attr('class', d => {
       const name = paFips[d.id];
+      if (name && unconfirmedCounties.includes(name)) return 'county unconfirmed';
       return (name && caseData[name]) ? 'county affected' : 'county';
     })
     .attr('d', path);
