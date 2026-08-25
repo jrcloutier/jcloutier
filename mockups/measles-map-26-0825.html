@@ -44,6 +44,13 @@
     margin-bottom: 16px;
   }
 
+  .dw-highlight {
+    text-decoration-line: underline;
+    text-decoration-color: #a93226;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 5px;
+  }
+
   #map-svg {
     width: 100%;
     display: block;
@@ -62,8 +69,9 @@
     margin: 0 1px;
   }
 
-  .county          { fill: #efefef; stroke: #fff; stroke-width: 0.75px; }
-  .county.affected { fill: url(#hatch-active); }
+  .county             { fill: #efefef; stroke: #fff; stroke-width: 0.75px; }
+  .county.affected    { fill: url(#hatch-active); }
+  .county.transmission{ fill: url(#hatch-transmission); stroke: #7a1a10; stroke-width: 1px; }
   .bubble          { stroke-width: 1px; fill: #a93226; stroke: #a93226; fill-opacity: 0.12; cursor: pointer; transition: fill-opacity 0.1s; }
   .bubble:hover    { fill-opacity: 0.45; }
 
@@ -147,11 +155,20 @@
   };
 /* SCRAPER-DATA-END */
 
+// Counties the DOH dashboard's "Community Transmission" tab flags as having
+// active local spread (as opposed to a case tied to travel or a known
+// contact) — pulled by hand from that tab, since the daily scraper doesn't
+// walk it yet. Update alongside caseData when the dashboard's figure moves.
+const TRANSMISSION_COUNTIES = [
+  "Berks", "Centre", "Chester", "Clearfield", "Indiana",
+  "Jefferson", "Lancaster", "Mifflin", "Snyder", "York"
+];
+
 const countyCount = Object.keys(caseData).length;
 document.getElementById('dw-title').textContent =
   `Measles cases have spread to more than two dozen counties`;
-document.getElementById('dw-description').textContent =
-  `Pennsylvania state health officials this year have reported cases in ${countyCount} counties — nearly half of them in Lancaster County, which is the epicenter of the current outbreak.`;
+document.getElementById('dw-description').innerHTML =
+  `Measles cases have been reported in ${countyCount} counties this year. State health officials have identified at least ${TRANSMISSION_COUNTIES.length} counties where measles is <span class="dw-highlight">especially active</span> and the risk of being infected is highest.`;
 document.getElementById('dw-asof').textContent = lastUpdated;
 
 const paFips = {
@@ -174,10 +191,7 @@ const paFips = {
   "42129":"Westmoreland","42131":"Wyoming","42133":"York"
 };
 
-const labelConfig = {
-  "Lancaster": { anchor: "middle", dx: 0, dy: 1,  pos: "below" },
-  "Lebanon":   { anchor: "middle", dx: 0, dy: -1, pos: "above" },
-};
+const labelConfig = {};
 
 const cities = [
   { name: "Philadelphia", lon: -75.1652, lat: 39.9526, anchor: "middle", dx: 0, dy: 18, star: false },
@@ -287,15 +301,49 @@ function render() {
     .call(p => p.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 6)
       .attr('stroke', '#e0b8a8').attr('stroke-width', 1));
 
+  defs.append('pattern')
+    .attr('id', 'hatch-transmission')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 6).attr('height', 6)
+    .attr('patternTransform', 'rotate(45)')
+    .call(p => p.append('rect').attr('width', 6).attr('height', 6).attr('fill', '#dba99c'))
+    .call(p => p.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 6)
+      .attr('stroke', '#c8886f').attr('stroke-width', 1));
+
   // Counties
   g.selectAll('.county')
     .data(paCounties.features)
     .join('path')
     .attr('class', d => {
       const name = paFips[d.id];
-      return (name && caseData[name]) ? 'county affected' : 'county';
+      let cls = (name && caseData[name]) ? 'county affected' : 'county';
+      if (name && TRANSMISSION_COUNTIES.includes(name)) cls += ' transmission';
+      return cls;
     })
     .attr('d', path);
+
+  // A per-county stroke on every transmission county draws just as heavy a
+  // line between two ADJACENT transmission counties as it does at the true
+  // edge of the cluster — the shared internal borders end up just as dark
+  // as the outer one, so a contiguous run of counties reads as a uniform
+  // grid instead of one highlighted region. Meshing the topology instead
+  // keeps only the arcs where membership actually changes (plus any state-
+  // edge arcs of a member county), so a single outline traces just the
+  // true perimeter of the transmission counties, however many there are or
+  // however they're clustered.
+  const inTransmissionSet = f => !!f && TRANSMISSION_COUNTIES.includes(paFips[f.id]);
+  const transmissionOutline = topojson.mesh(PA_TOPOLOGY, PA_TOPOLOGY.objects.counties, (a, b) => {
+    const aIn = inTransmissionSet(a), bIn = inTransmissionSet(b);
+    return aIn !== bIn || (a === b && aIn);
+  });
+  g.append('path')
+    .datum(transmissionOutline)
+    .attr('d', path)
+    .attr('fill', 'none')
+    .attr('stroke', '#a93226')
+    .attr('stroke-width', 1.5)
+    .attr('stroke-linejoin', 'round')
+    .attr('pointer-events', 'none');
 
   // Bubbles + labels
   Object.entries(caseData).forEach(([name, cases]) => {
