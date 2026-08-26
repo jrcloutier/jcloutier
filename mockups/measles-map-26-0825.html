@@ -74,6 +74,8 @@
   .county.transmission{ fill: url(#hatch-transmission); stroke: #7a1a10; stroke-width: 1px; }
   .bubble          { stroke-width: 1px; fill: #a93226; stroke: #a93226; fill-opacity: 0.12; cursor: pointer; transition: fill-opacity 0.1s; }
   .bubble:hover    { fill-opacity: 0.45; }
+  .bubble.dot      { fill: none; stroke-width: 1.25px; transition: stroke-width 0.1s; }
+  .bubble.dot:hover{ stroke-width: 2.5px; }
 
   #tooltip {
     position: fixed;
@@ -168,7 +170,7 @@ const countyCount = Object.keys(caseData).length;
 document.getElementById('dw-title').textContent =
   `Measles cases have spread to more than two dozen counties`;
 document.getElementById('dw-description').innerHTML =
-  `Measles cases have been reported in ${countyCount} counties this year. State health officials have identified at least ${TRANSMISSION_COUNTIES.length} counties where measles is <span class="dw-highlight">especially active</span> and the risk of being infected is highest.`;
+  `Measles cases have been reported in ${countyCount} counties this year. State health officials have identified at least ${TRANSMISSION_COUNTIES.length} counties where measles is <span class="dw-highlight">actively circulating</span> and the risk of being infected is highest.`;
 document.getElementById('dw-asof').textContent = lastUpdated;
 
 const paFips = {
@@ -280,11 +282,18 @@ function render() {
 
   const path = d3.geoPath().projection(projection);
   const maxCases = d3.max(Object.values(caseData));
-  // Floored so single-digit counts (e.g. "1") still get a bubble large
-  // enough to hold their label legibly — otherwise the sqrt scale alone
-  // shrinks them to a few pixels.
-  const rScaleRaw = d3.scaleSqrt().domain([0, maxCases]).range([0, 48]);
-  const rScale = v => Math.max(8, rScaleRaw(v));
+  // Floored so a labeled county's bubble is still large enough to hold its
+  // number legibly — otherwise the sqrt scale alone shrinks the smallest
+  // labeled counts to a few pixels. Counties below LABEL_MIN don't use this
+  // scale at all — they render as a small fixed dot instead (see below).
+  const rScaleRaw = d3.scaleSqrt().domain([0, maxCases]).range([0, 42]);
+  const rScale = v => Math.max(9, rScaleRaw(v));
+
+  // Below this many cases, a county gets a small unlabeled dot instead of a
+  // numbered bubble — with case counts this high, full bubbles for every
+  // single-digit county packed the map too densely to read.
+  const LABEL_MIN = 5;
+  const DOT_RADIUS = 2.5;
 
   const svg = d3.select('#map-svg');
   svg.selectAll('*').remove();
@@ -351,6 +360,17 @@ function render() {
     const feature = paCounties.features.find(f => paFips[f.id] === name);
     if (!feature) return;
     const centroid = path.centroid(feature);
+
+    if (cases < LABEL_MIN) {
+      g.append('circle')
+        .attr('class', 'bubble dot')
+        .attr('cx', centroid[0]).attr('cy', centroid[1]).attr('r', DOT_RADIUS)
+        .on('mouseover', e => showTip(e, name, cases))
+        .on('mousemove', moveTip)
+        .on('mouseout', hideTip);
+      return;
+    }
+
     const r = rScale(cases);
 
     g.append('circle')
@@ -360,13 +380,19 @@ function render() {
       .on('mousemove', moveTip)
       .on('mouseout', hideTip);
 
-    g.append('text').attr('class', `case-count-label${cases < 10 ? ' small' : ''}`)
-      .attr('x', centroid[0]).attr('y', centroid[1])
-      .attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
-      .attr('font-family', "'Roboto', Arial, sans-serif")
-      .attr('font-size', r > 25 ? '14px' : '12px')
-      .attr('font-weight', '700').attr('fill', '#7a1a10')
-      .text(cases);
+    // Number labels are restricted to actively-circulating counties — the
+    // bubble's size still encodes every county's case count, but the exact
+    // number is only called out where it matters most.
+    if (TRANSMISSION_COUNTIES.includes(name)) {
+      g.append('text').attr('class', `case-count-label${cases < 10 ? ' small' : ''}`)
+        .attr('x', centroid[0]).attr('y', centroid[1])
+        .attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+        .attr('font-family', "'Roboto', Arial, sans-serif")
+        .attr('font-size', r > 25 ? '14px' : '12px')
+        .attr('font-weight', '700').attr('fill', '#7a1a10')
+        .attr('pointer-events', 'none')
+        .text(cases);
+    }
 
     // County labels
     const cfg = labelConfig[name];
